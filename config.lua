@@ -60,9 +60,9 @@ lvim.builtin.which_key.mappings["t"] = {
 lvim.builtin.alpha.active = true
 lvim.builtin.alpha.mode = "dashboard"
 lvim.builtin.notify.active = true
+lvim.builtin.dap.active = true -- (default: false)
 lvim.builtin.terminal.active = true
 lvim.builtin.nvimtree.setup.view.side = "left"
-lvim.builtin.nvimtree.show_icons.git = 0
 
 -- if you don't want all the parsers change this to a table of the ones you want
 lvim.builtin.treesitter.ensure_installed = {
@@ -145,6 +145,25 @@ code_actions.setup {
     command = "proselint"
   },
 }
+
+-- lsp config
+
+local function on_attach(client, bufnr)
+  -- Find the clients capabilities
+  local cap = client.resolved_capabilities
+
+  -- Only highlight if compatible with the language
+  if cap.document_highlight then
+    vim.cmd('augroup LspHighlight')
+    vim.cmd('autocmd!')
+    vim.cmd('autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()')
+    vim.cmd('autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()')
+    vim.cmd('augroup END')
+  end
+end
+
+require 'lspconfig'.tsserver.setup({ on_attach = on_attach })
+
 
 -- Additional Plugins
 lvim.plugins = {
@@ -263,11 +282,28 @@ lvim.plugins = {
   { "rust-lang/rust.vim" },
 
   {
-    "simrat39/rust-tools.nvim",
+    -- "simrat39/rust-tools.nvim",
+    -- need to run following command for newer version
+    -- ln -s liblldb.dylib liblldb.so
+    "freyskeyd/rust-tools.nvim",
+    branch = 'dap_fix',
+
     config = function()
+
       local lsp_installer_servers = require "nvim-lsp-installer.servers"
       local _, requested_server = lsp_installer_servers.get_server "rust_analyzer"
+
+      local extension_path = vim.env.HOME .. '/.vscode/extensions/vadimcn.vscode-lldb-1.7.0/'
+      local codelldb_path = extension_path .. 'adapter/codelldb'
+      local liblldb_path = extension_path .. 'lldb/lib/liblldb.so'
+
+
       require("rust-tools").setup({
+
+        dap = {
+          adapter = require('rust-tools.dap').get_codelldb_adapter(codelldb_path, liblldb_path)
+        },
+
         tools = {
           autoSetHints = true,
           hover_with_actions = true,
