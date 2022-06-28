@@ -282,27 +282,35 @@ lvim.plugins = {
   { "rust-lang/rust.vim" },
 
   {
-    -- "simrat39/rust-tools.nvim",
+    "simrat39/rust-tools.nvim",
     -- need to run following command for newer version
     -- ln -s liblldb.dylib liblldb.so
-    "freyskeyd/rust-tools.nvim",
-    branch = 'dap_fix',
+    -- "freyskeyd/rust-tools.nvim",
+    -- branch = 'dap_fix',
 
     config = function()
 
       local lsp_installer_servers = require "nvim-lsp-installer.servers"
       local _, requested_server = lsp_installer_servers.get_server "rust_analyzer"
 
-      local extension_path = vim.env.HOME .. '/.vscode/extensions/vadimcn.vscode-lldb-1.7.0/'
-      local codelldb_path = extension_path .. 'adapter/codelldb'
-      local liblldb_path = extension_path .. 'lldb/lib/liblldb.so'
-
+      -- local extension_path = vim.env.HOME .. '/.vscode/extensions/vadimcn.vscode-lldb-1.7.0/'
+      -- local codelldb_path = extension_path .. 'adapter/codelldb'
+      -- local liblldb_path = extension_path .. 'lldb/lib/liblldb.so'
 
       require("rust-tools").setup({
 
+        -- dap = {
+        --   adapter = require('rust-tools.dap').get_codelldb_adapter(codelldb_path, liblldb_path)
+        -- },
+
         dap = {
-          adapter = require('rust-tools.dap').get_codelldb_adapter(codelldb_path, liblldb_path)
+          adapter = {
+            type = "executable",
+            command = "/opt/homebrew/opt/llvm/bin/lldb-vscode",
+            name = "rt_lldb",
+          },
         },
+
 
         tools = {
           autoSetHints = true,
@@ -316,9 +324,51 @@ lvim.plugins = {
           on_attach = require("lvim.lsp").common_on_attach,
           on_init = require("lvim.lsp").common_on_init,
         },
+
+        --- inline hints
+        hover_with_actions = true,
+        inlay_hints = {
+
+          -- whether to show variable name before type hints with the inlay hints or not
+          -- default: false
+          show_variable_name = true,
+
+          -- The color of the hints
+          highlight = "Comment",
+        },
+
+        -- options same as lsp hover / vim.lsp.util.open_floating_preview()
+        hover_actions = {
+          -- the border that is used for the hover window
+          -- see vim.api.nvim_open_win()
+          border = {
+            { "╭", "FloatBorder" },
+            { "─", "FloatBorder" },
+            { "╮", "FloatBorder" },
+            { "│", "FloatBorder" },
+            { "╯", "FloatBorder" },
+            { "─", "FloatBorder" },
+            { "╰", "FloatBorder" },
+            { "│", "FloatBorder" },
+          },
+
+          -- whether the hover action window gets automatically focused
+          -- default: false
+          auto_focus = false,
+        },
+
       })
     end,
     ft = { "rust", "rs" },
+  },
+
+  -- completion
+
+  {
+    "tzachar/cmp-tabnine",
+    run = "./install.sh",
+    requires = "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
   },
 
 
@@ -353,10 +403,24 @@ lvim.plugins = {
     event = "BufRead",
     config = function()
       require("hop").setup()
-      vim.api.nvim_set_keymap("n", "s", ":HopChar2<cr>", { silent = true })
+      vim.api.nvim_set_keymap("n", "s", ":HopChar1<cr>", { silent = true })
       vim.api.nvim_set_keymap("n", "S", ":HopWord<cr>", { silent = true })
     end,
   },
+}
+
+-- Rust key mappings
+
+lvim.builtin.which_key.mappings["r"] = {
+  name = "Rust Run",
+  r = { ":update<CR>:RustRun<CR>", "Rust run" },
+  d = { ":update<CR>:RustDebuggables<CR>", "Rust debuggables" },
+  w = {
+    ":update<CR>:sp term://cargo watch -s 'clear && cargo run -q'<CR>",
+    "Cargo watch",
+  },
+  c = { ":update<CR>:Cargo run<CR>", "Cargo run" },
+  l = { ":RustRunnables<CR>", "Rust runnables" },
 }
 
 --- Which Key Mappings
