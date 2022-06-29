@@ -412,15 +412,16 @@ lvim.plugins = {
 -- Rust key mappings
 
 lvim.builtin.which_key.mappings["r"] = {
-  name = "Rust Run",
+  name = "Rust Commands",
   r = { ":update<CR>:RustRun<CR>", "Rust run" },
   d = { ":update<CR>:RustDebuggables<CR>", "Rust debuggables" },
+  l = { ":RustRunnables<CR>", "Rust runnables" },
+  c = { ":update<CR>:Cargo run<CR>", "Cargo run" },
+  p = { ":update<CR>:Cargo clippy<CR>", "Cargo clippy" },
   w = {
     ":update<CR>:sp term://cargo watch -s 'clear && cargo run -q'<CR>",
     "Cargo watch",
   },
-  c = { ":update<CR>:Cargo run<CR>", "Cargo run" },
-  l = { ":RustRunnables<CR>", "Rust runnables" },
 }
 
 --- Which Key Mappings
