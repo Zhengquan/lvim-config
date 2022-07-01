@@ -64,6 +64,11 @@ lvim.builtin.dap.active = true -- (default: false)
 lvim.builtin.terminal.active = true
 lvim.builtin.nvimtree.setup.view.side = "left"
 
+
+-- disable always jumping to home directory
+lvim.builtin.project.manual_mode = true
+
+
 -- if you don't want all the parsers change this to a table of the ones you want
 lvim.builtin.treesitter.ensure_installed = {
   "bash",
