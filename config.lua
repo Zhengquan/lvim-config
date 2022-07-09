@@ -121,6 +121,7 @@ formatters.setup {
   { command = "black", filetypes = { "python" } },
   { command = "isort", filetypes = { "python" } },
   { command = "rustfmt", filetypes = { "rust" } },
+  { command = "gofmt", filetypes = { "go" } },
   {
     command = "prettier",
     extra_args = { "--print-with", "100" },
@@ -412,6 +413,11 @@ lvim.plugins = {
       vim.api.nvim_set_keymap("n", "S", ":HopWord<cr>", { silent = true })
     end,
   },
+
+  -- golang
+  { 'ray-x/go.nvim' },
+  { 'ray-x/guihua.lua' },
+
 }
 
 -- Rust key mappings
