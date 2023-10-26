@@ -59,7 +59,6 @@ lvim.builtin.which_key.mappings["t"] = {
 -- After changing plugin config exit and reopen LunarVim, Run :PackerInstall :PackerCompile
 lvim.builtin.alpha.active = true
 lvim.builtin.alpha.mode = "dashboard"
-lvim.builtin.notify.active = true
 lvim.builtin.dap.active = true -- (default: false)
 lvim.builtin.terminal.active = true
 lvim.builtin.nvimtree.setup.view.side = "left"
@@ -194,7 +193,7 @@ lvim.plugins = {
 
   {
     'wfxr/minimap.vim',
-    run = "cargo install --locked code-minimap",
+    build = "cargo install --locked code-minimap",
     cmd = { "Minimap", "MinimapClose", "MinimapToggle", "MinimapRefresh", "MinimapUpdateHighlight" },
     config = function()
       vim.cmd("let g:minimap_width = 10")
@@ -206,23 +205,8 @@ lvim.plugins = {
   -- vim surround
   {
     "tpope/vim-surround",
-    keys = {
-      { 'n', 'ds' },
-      { 'n', 'cs' },
-      { 'n', 'cS' },
-      { 'n', 'ys' },
-      { 'n', 'yS' },
-      { 'n', 'yss' },
-      { 'n', 'ySs' },
-      { 'n', 'ySS' },
-      { 'x', 'S' },
-      { 'x', 'gS' },
-      { 'i', '<C-S>' },
-      { 'i', '<C-G>s' },
-      { 'i', '<C-G>S' }
-    },
     -- make sure to change the value of `timeoutlen` if it's not triggering correctly, see https://github.com/tpope/vim-surround/issues/117
-    setup = function()
+    init = function()
       vim.o.timeoutlen = 500
     end
   },
@@ -267,7 +251,7 @@ lvim.plugins = {
     -- 动态预览
     "davidgranstrom/nvim-markdown-preview",
     cmd = "MarkdownPreview",
-    setup = function()
+    init = function()
       vim.cmd [[
         let g:nvim_markdown_preview_theme = 'github'
         let g:nvim_markdown_preview_format = 'markdown'
@@ -281,99 +265,18 @@ lvim.plugins = {
   -- dash.vim for document search
   {
     'mrjones2014/dash.nvim',
-    run = 'make install',
+    build = 'make install',
   },
 
   -- rust vim
   { "rust-lang/rust.vim" },
 
-  {
-    "simrat39/rust-tools.nvim",
-    -- need to run following command for newer version
-    -- ln -s liblldb.dylib liblldb.so
-    -- "freyskeyd/rust-tools.nvim",
-    -- branch = 'dap_fix',
-
-    config = function()
-
-      local lsp_installer_servers = require "nvim-lsp-installer.servers"
-      local _, requested_server = lsp_installer_servers.get_server "rust_analyzer"
-
-      -- local extension_path = vim.env.HOME .. '/.vscode/extensions/vadimcn.vscode-lldb-1.7.0/'
-      -- local codelldb_path = extension_path .. 'adapter/codelldb'
-      -- local liblldb_path = extension_path .. 'lldb/lib/liblldb.so'
-
-      require("rust-tools").setup({
-
-        -- dap = {
-        --   adapter = require('rust-tools.dap').get_codelldb_adapter(codelldb_path, liblldb_path)
-        -- },
-
-        dap = {
-          adapter = {
-            type = "executable",
-            command = "/opt/homebrew/opt/llvm/bin/lldb-vscode",
-            name = "rt_lldb",
-          },
-        },
-
-
-        tools = {
-          autoSetHints = true,
-          hover_with_actions = true,
-          runnables = {
-            use_telescope = true,
-          },
-        },
-        server = {
-          cmd_env = requested_server._default_options.cmd_env,
-          on_attach = require("lvim.lsp").common_on_attach,
-          on_init = require("lvim.lsp").common_on_init,
-        },
-
-        --- inline hints
-        hover_with_actions = true,
-        inlay_hints = {
-
-          -- whether to show variable name before type hints with the inlay hints or not
-          -- default: false
-          show_variable_name = true,
-
-          -- The color of the hints
-          highlight = "Comment",
-        },
-
-        -- options same as lsp hover / vim.lsp.util.open_floating_preview()
-        hover_actions = {
-          -- the border that is used for the hover window
-          -- see vim.api.nvim_open_win()
-          border = {
-            { "╭", "FloatBorder" },
-            { "─", "FloatBorder" },
-            { "╮", "FloatBorder" },
-            { "│", "FloatBorder" },
-            { "╯", "FloatBorder" },
-            { "─", "FloatBorder" },
-            { "╰", "FloatBorder" },
-            { "│", "FloatBorder" },
-          },
-
-          -- whether the hover action window gets automatically focused
-          -- default: false
-          auto_focus = false,
-        },
-
-      })
-    end,
-    ft = { "rust", "rs" },
-  },
-
   -- completion
 
   {
     "tzachar/cmp-tabnine",
-    run = "./install.sh",
-    requires = "hrsh7th/nvim-cmp",
+    build = "./install.sh",
+    dependencies = "hrsh7th/nvim-cmp",
     event = "InsertEnter",
   },
 
@@ -448,7 +351,7 @@ lvim.builtin.which_key.mappings["D"] = { "<cmd>Telescope Dash search<CR>", "Dash
 -- local conf = require('modules.themes.config')
 -- theme["folke/tokyonight.nvim"] = {
 --   opt = true,
---   setup = conf.tokyonight,
+--   init = conf.tokyonight,
 --   config = function()
 --     vim.cmd [[hi CursorLine guibg=#353644]]
 --     vim.cmd([[colorscheme tokyonight]])
